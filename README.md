@@ -211,6 +211,12 @@ This project follows a **Repository-Service Pattern** with clear separation of c
 
 ## API Documentation
 
+### Publishment URL
+
+```
+https://documenter.getpostman.com/view/49395306/2sBXc8oioA
+```
+
 ### Base URL
 
 ```
