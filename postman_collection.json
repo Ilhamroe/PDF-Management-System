@@ -1,0 +1,595 @@
+{
+    "info": {
+        "_postman_id": "pdf-management-system-api",
+        "name": "PDF Management System API",
+        "description": "Complete API collection for PDF Management System - Generate, Upload, List, and Delete PDF files",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+        "_exporter_id": "pdf-management-system"
+    },
+    "item": [
+        {
+            "name": "1. Generate PDF",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json",
+                        "type": "text"
+                    },
+                    {
+                        "key": "Accept",
+                        "value": "application/json",
+                        "type": "text"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"title\": \"Monthly Sales Report\",\n  \"institution_name\": \"PT. Contoh Indonesia\",\n  \"address\": \"Jl. Merdeka No. 123, Jakarta Pusat, DKI Jakarta 10110\",\n  \"phone\": \"021-12345678\",\n  \"logo_url\": \"https://via.placeholder.com/80x80.png\",\n  \"content\": \"Laporan Penjualan Bulan Januari 2026\\n\\nTotal Penjualan: Rp 150.000.000\\nTotal Transaksi: 1.250\\nProduk Terlaris: Product A\\n\\nRingkasan:\\nPenjualan bulan ini mengalami peningkatan 15% dibandingkan bulan sebelumnya. Produk kategori elektronik masih mendominasi dengan kontribusi 45% dari total penjualan.\\n\\nTarget bulan depan: Rp 175.000.000\\n\\nDemikian laporan ini dibuat untuk dapat digunakan sebagaimana mestinya.\",\n  \"options\": {\n    \"paper_size\": \"A4\",\n    \"orientation\": \"portrait\"\n  }\n}",
+                    "options": {
+                        "raw": {
+                            "language": "json"
+                        }
+                    }
+                },
+                "url": {
+                    "raw": "{{base_url}}/pdf/generate",
+                    "host": ["{{base_url}}"],
+                    "path": ["pdf", "generate"]
+                },
+                "description": "Generate a new PDF document from provided HTML content with institution header and logo."
+            },
+            "response": [
+                {
+                    "name": "Success Response",
+                    "originalRequest": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"title\": \"Monthly Sales Report\",\n  \"institution_name\": \"PT. Contoh Indonesia\",\n  \"address\": \"Jl. Merdeka No. 123, Jakarta\",\n  \"phone\": \"021-12345678\",\n  \"logo_url\": \"https://via.placeholder.com/80x80.png\",\n  \"content\": \"This is the main content...\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/pdf/generate",
+                            "host": ["{{base_url}}"],
+                            "path": ["pdf", "generate"]
+                        }
+                    },
+                    "status": "Created",
+                    "code": 201,
+                    "_postman_previewlanguage": "json",
+                    "header": [
+                        {
+                            "key": "Content-Type",
+                            "value": "application/json"
+                        }
+                    ],
+                    "cookie": [],
+                    "body": "{\n  \"success\": true,\n  \"message\": \"PDF generated successfully\",\n  \"status_code\": 201,\n  \"data\": {\n    \"id\": 1,\n    \"filename\": \"report_20260206_143025_aBc123.pdf\",\n    \"filepath\": \"/uploads/pdf/report_20260206_143025_aBc123.pdf\",\n    \"status\": \"CREATED\",\n    \"created_at\": \"2026-02-06T14:30:25+07:00\"\n  }\n}"
+                },
+                {
+                    "name": "Validation Error",
+                    "originalRequest": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"institution_name\": \"PT. Contoh Indonesia\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/pdf/generate",
+                            "host": ["{{base_url}}"],
+                            "path": ["pdf", "generate"]
+                        }
+                    },
+                    "status": "Bad Request",
+                    "code": 400,
+                    "_postman_previewlanguage": "json",
+                    "header": [
+                        {
+                            "key": "Content-Type",
+                            "value": "application/json"
+                        }
+                    ],
+                    "cookie": [],
+                    "body": "{\n  \"success\": false,\n  \"status_code\": 400,\n  \"message\": \"Field 'title' is required\"\n}"
+                }
+            ]
+        },
+        {
+            "name": "2. Upload PDF",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Accept",
+                        "value": "application/json",
+                        "type": "text"
+                    }
+                ],
+                "body": {
+                    "mode": "formdata",
+                    "formdata": [
+                        {
+                            "key": "file",
+                            "type": "file",
+                            "src": [],
+                            "description": "Select a PDF file to upload (max 10MB)"
+                        }
+                    ]
+                },
+                "url": {
+                    "raw": "{{base_url}}/pdf/upload",
+                    "host": ["{{base_url}}"],
+                    "path": ["pdf", "upload"]
+                },
+                "description": "Upload an existing PDF file to the system with validation (max 10MB, PDF only)."
+            },
+            "response": [
+                {
+                    "name": "Success Response",
+                    "originalRequest": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "formdata",
+                            "formdata": [
+                                {
+                                    "key": "file",
+                                    "type": "file",
+                                    "src": "document.pdf"
+                                }
+                            ]
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/pdf/upload",
+                            "host": ["{{base_url}}"],
+                            "path": ["pdf", "upload"]
+                        }
+                    },
+                    "status": "Created",
+                    "code": 201,
+                    "_postman_previewlanguage": "json",
+                    "header": [
+                        {
+                            "key": "Content-Type",
+                            "value": "application/json"
+                        }
+                    ],
+                    "cookie": [],
+                    "body": "{\n  \"success\": true,\n  \"message\": \"PDF uploaded successfully\",\n  \"status_code\": 201,\n  \"data\": {\n    \"id\": 2,\n    \"original_name\": \"document.pdf\",\n    \"filename\": \"upload_20260206_143530_xYz789.pdf\",\n    \"filepath\": \"/uploads/pdf/upload_20260206_143530_xYz789.pdf\",\n    \"size\": 245678,\n    \"status\": \"UPLOADED\",\n    \"created_at\": \"2026-02-06T14:35:30+07:00\"\n  }\n}"
+                },
+                {
+                    "name": "No File Uploaded",
+                    "originalRequest": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "formdata",
+                            "formdata": []
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/pdf/upload",
+                            "host": ["{{base_url}}"],
+                            "path": ["pdf", "upload"]
+                        }
+                    },
+                    "status": "Bad Request",
+                    "code": 400,
+                    "_postman_previewlanguage": "json",
+                    "header": [
+                        {
+                            "key": "Content-Type",
+                            "value": "application/json"
+                        }
+                    ],
+                    "cookie": [],
+                    "body": "{\n  \"success\": false,\n  \"status_code\": 400,\n  \"message\": \"No file uploaded\",\n  \"error_code\": \"NO_FILE\"\n}"
+                },
+                {
+                    "name": "File Too Large",
+                    "originalRequest": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "formdata",
+                            "formdata": [
+                                {
+                                    "key": "file",
+                                    "type": "file",
+                                    "src": "large-file.pdf"
+                                }
+                            ]
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/pdf/upload",
+                            "host": ["{{base_url}}"],
+                            "path": ["pdf", "upload"]
+                        }
+                    },
+                    "status": "Payload Too Large",
+                    "code": 413,
+                    "_postman_previewlanguage": "json",
+                    "header": [
+                        {
+                            "key": "Content-Type",
+                            "value": "application/json"
+                        }
+                    ],
+                    "cookie": [],
+                    "body": "{\n  \"success\": false,\n  \"status_code\": 413,\n  \"message\": \"File size exceeds maximum limit (10MB)\",\n  \"error_code\": \"FILE_TOO_LARGE\"\n}"
+                },
+                {
+                    "name": "Invalid File Type",
+                    "originalRequest": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "formdata",
+                            "formdata": [
+                                {
+                                    "key": "file",
+                                    "type": "file",
+                                    "src": "document.docx"
+                                }
+                            ]
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/pdf/upload",
+                            "host": ["{{base_url}}"],
+                            "path": ["pdf", "upload"]
+                        }
+                    },
+                    "status": "Unprocessable Entity",
+                    "code": 422,
+                    "_postman_previewlanguage": "json",
+                    "header": [
+                        {
+                            "key": "Content-Type",
+                            "value": "application/json"
+                        }
+                    ],
+                    "cookie": [],
+                    "body": "{\n  \"success\": false,\n  \"status_code\": 422,\n  \"message\": \"Only PDF files are allowed\",\n  \"error_code\": \"INVALID_EXTENSION\"\n}"
+                }
+            ]
+        },
+        {
+            "name": "3. List PDFs (All)",
+            "request": {
+                "method": "GET",
+                "header": [
+                    {
+                        "key": "Accept",
+                        "value": "application/json",
+                        "type": "text"
+                    }
+                ],
+                "url": {
+                    "raw": "{{base_url}}/pdf/list",
+                    "host": ["{{base_url}}"],
+                    "path": ["pdf", "list"]
+                },
+                "description": "Retrieve all PDF files with default pagination (page 1, limit 10)."
+            },
+            "response": [
+                {
+                    "name": "Success Response",
+                    "originalRequest": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/pdf/list",
+                            "host": ["{{base_url}}"],
+                            "path": ["pdf", "list"]
+                        }
+                    },
+                    "status": "OK",
+                    "code": 200,
+                    "_postman_previewlanguage": "json",
+                    "header": [
+                        {
+                            "key": "Content-Type",
+                            "value": "application/json"
+                        }
+                    ],
+                    "cookie": [],
+                    "body": "{\n  \"success\": true,\n  \"message\": \"PDF list retrieved successfully\",\n  \"status_code\": 200,\n  \"data\": [\n    {\n      \"id\": 1,\n      \"filename\": \"report_20260206_143025_aBc123.pdf\",\n      \"original_name\": \"Monthly Sales Report.pdf\",\n      \"size\": 156789,\n      \"status\": \"CREATED\",\n      \"created_at\": \"2026-02-06T14:30:25+07:00\",\n      \"deleted_at\": null\n    },\n    {\n      \"id\": 2,\n      \"filename\": \"upload_20260206_143530_xYz789.pdf\",\n      \"original_name\": \"document.pdf\",\n      \"size\": 245678,\n      \"status\": \"UPLOADED\",\n      \"created_at\": \"2026-02-06T14:35:30+07:00\",\n      \"deleted_at\": null\n    }\n  ],\n  \"pagination\": {\n    \"page\": 1,\n    \"limit\": 10,\n    \"total\": 2\n  }\n}"
+                }
+            ]
+        },
+        {
+            "name": "3. List PDFs (with Filters)",
+            "request": {
+                "method": "GET",
+                "header": [
+                    {
+                        "key": "Accept",
+                        "value": "application/json",
+                        "type": "text"
+                    }
+                ],
+                "url": {
+                    "raw": "{{base_url}}/pdf/list?status=UPLOADED&page=1&limit=5",
+                    "host": ["{{base_url}}"],
+                    "path": ["pdf", "list"],
+                    "query": [
+                        {
+                            "key": "status",
+                            "value": "UPLOADED",
+                            "description": "Filter by status: CREATED, UPLOADED, or DELETED"
+                        },
+                        {
+                            "key": "page",
+                            "value": "1",
+                            "description": "Page number (min: 1)"
+                        },
+                        {
+                            "key": "limit",
+                            "value": "5",
+                            "description": "Items per page (min: 1, max: 100)"
+                        }
+                    ]
+                },
+                "description": "Retrieve PDF files filtered by status with custom pagination."
+            },
+            "response": [
+                {
+                    "name": "Success Response with Filters",
+                    "originalRequest": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/pdf/list?status=UPLOADED&page=1&limit=5",
+                            "host": ["{{base_url}}"],
+                            "path": ["pdf", "list"],
+                            "query": [
+                                {
+                                    "key": "status",
+                                    "value": "UPLOADED"
+                                },
+                                {
+                                    "key": "page",
+                                    "value": "1"
+                                },
+                                {
+                                    "key": "limit",
+                                    "value": "5"
+                                }
+                            ]
+                        }
+                    },
+                    "status": "OK",
+                    "code": 200,
+                    "_postman_previewlanguage": "json",
+                    "header": [
+                        {
+                            "key": "Content-Type",
+                            "value": "application/json"
+                        }
+                    ],
+                    "cookie": [],
+                    "body": "{\n  \"success\": true,\n  \"message\": \"PDF list retrieved successfully\",\n  \"status_code\": 200,\n  \"data\": [\n    {\n      \"id\": 2,\n      \"filename\": \"upload_20260206_143530_xYz789.pdf\",\n      \"original_name\": \"document.pdf\",\n      \"size\": 245678,\n      \"status\": \"UPLOADED\",\n      \"created_at\": \"2026-02-06T14:35:30+07:00\",\n      \"deleted_at\": null\n    }\n  ],\n  \"pagination\": {\n    \"page\": 1,\n    \"limit\": 5,\n    \"total\": 1\n  }\n}"
+                }
+            ]
+        },
+        {
+            "name": "3. List PDFs (Pagination)",
+            "request": {
+                "method": "GET",
+                "header": [
+                    {
+                        "key": "Accept",
+                        "value": "application/json",
+                        "type": "text"
+                    }
+                ],
+                "url": {
+                    "raw": "{{base_url}}/pdf/list?page=2&limit=20",
+                    "host": ["{{base_url}}"],
+                    "path": ["pdf", "list"],
+                    "query": [
+                        {
+                            "key": "page",
+                            "value": "2",
+                            "description": "Page number"
+                        },
+                        {
+                            "key": "limit",
+                            "value": "20",
+                            "description": "Items per page"
+                        }
+                    ]
+                },
+                "description": "Retrieve PDF files with custom pagination (page 2, 20 items per page)."
+            },
+            "response": []
+        },
+        {
+            "name": "4. Delete PDF",
+            "request": {
+                "method": "DELETE",
+                "header": [
+                    {
+                        "key": "Accept",
+                        "value": "application/json",
+                        "type": "text"
+                    }
+                ],
+                "url": {
+                    "raw": "{{base_url}}/pdf/1",
+                    "host": ["{{base_url}}"],
+                    "path": ["pdf", "1"]
+                },
+                "description": "Soft delete a PDF file by ID. The file status will be changed to DELETED and soft delete timestamp will be set."
+            },
+            "response": [
+                {
+                    "name": "Success Response",
+                    "originalRequest": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/pdf/1",
+                            "host": ["{{base_url}}"],
+                            "path": ["pdf", "1"]
+                        }
+                    },
+                    "status": "OK",
+                    "code": 200,
+                    "_postman_previewlanguage": "json",
+                    "header": [
+                        {
+                            "key": "Content-Type",
+                            "value": "application/json"
+                        }
+                    ],
+                    "cookie": [],
+                    "body": "{\n  \"success\": true,\n  \"message\": \"PDF deleted successfully\",\n  \"status_code\": 200,\n  \"data\": {\n    \"id\": 1,\n    \"filename\": \"report_20260206_143025_aBc123.pdf\",\n    \"status\": \"DELETED\",\n    \"deleted_at\": \"2026-02-06T15:00:00+07:00\"\n  }\n}"
+                },
+                {
+                    "name": "Not Found",
+                    "originalRequest": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/pdf/999",
+                            "host": ["{{base_url}}"],
+                            "path": ["pdf", "999"]
+                        }
+                    },
+                    "status": "Not Found",
+                    "code": 404,
+                    "_postman_previewlanguage": "json",
+                    "header": [
+                        {
+                            "key": "Content-Type",
+                            "value": "application/json"
+                        }
+                    ],
+                    "cookie": [],
+                    "body": "{\n  \"success\": false,\n  \"status_code\": 404,\n  \"message\": \"PDF file not found\"\n}"
+                },
+                {
+                    "name": "Already Deleted",
+                    "originalRequest": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/pdf/1",
+                            "host": ["{{base_url}}"],
+                            "path": ["pdf", "1"]
+                        }
+                    },
+                    "status": "Conflict",
+                    "code": 409,
+                    "_postman_previewlanguage": "json",
+                    "header": [
+                        {
+                            "key": "Content-Type",
+                            "value": "application/json"
+                        }
+                    ],
+                    "cookie": [],
+                    "body": "{\n  \"success\": false,\n  \"status_code\": 409,\n  \"message\": \"PDF file is already deleted\"\n}"
+                }
+            ]
+        }
+    ],
+    "event": [
+        {
+            "listen": "prerequest",
+            "script": {
+                "type": "text/javascript",
+                "exec": [""]
+            }
+        },
+        {
+            "listen": "test",
+            "script": {
+                "type": "text/javascript",
+                "exec": [""]
+            }
+        }
+    ],
+    "variable": [
+        {
+            "key": "base_url",
+            "value": "http://localhost:8000/api",
+            "type": "string"
+        }
+    ]
+}
