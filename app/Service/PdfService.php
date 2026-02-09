@@ -96,12 +96,19 @@ class PdfService
             return FormatPdf::formatListItem($pdf);
         });
 
+        $pagination = PaginationService::buildPaginationMeta(
+            $page,
+            $limit,
+            $result['pagination']['total'],
+            $filters 
+        );
+
         return [
             'success' => true,
             'message' => 'PDF list retrieved successfully',
             'status_code' => 200,
             'data' => $data->toArray(),
-            'pagination' => $result['pagination'],
+            'pagination' => $pagination,
         ];
     }
 

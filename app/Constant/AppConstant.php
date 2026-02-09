@@ -3,12 +3,10 @@
 namespace App\Constant;
 class AppConstant
 {
-    // PDF Status
     const PDF_STATUS_CREATED = 'CREATED';
     const PDF_STATUS_UPLOADED = 'UPLOADED';
     const PDF_STATUS_DELETED = 'DELETED';
     
-    // Upload Configuration
     const MAX_FILE_SIZE = 10485760; // 10 * 1024 * 1024 bytes (10MB)
     const PDF_UPLOAD_PATH = 'uploads/pdf';
     

@@ -3,6 +3,8 @@
 namespace App\Helper;
 
 use App\Constant\AppConstant;
+use App\Models\PdfFile;
+use Barryvdh\DomPDF\PDF;
 use Exception;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
@@ -32,7 +34,7 @@ class FormatPdf
             'data' => [
                 'id' => $pdfRecord->id,
                 'filename' => $pdfRecord->filename,
-                'filepath' => '/' . $pdfRecord->filepath,
+                'filepath' => url(Storage::url($pdfRecord->filepath)),
                 'status' => $pdfRecord->status,
                 'created_at' => $pdfRecord->created_at->toIso8601String(),
             ]
@@ -49,7 +51,7 @@ class FormatPdf
                 'id' => $pdfRecord->id,
                 'original_name' => $pdfRecord->original_filename,
                 'filename' => $pdfRecord->filename,
-                'filepath' => '/' . $pdfRecord->filepath,
+                'filepath' => url(Storage::url($pdfRecord->filepath)),
                 'size' => $pdfRecord->size,
                 'status' => $pdfRecord->status,
                 'created_at' => $pdfRecord->created_at->toIso8601String(),
@@ -85,18 +87,26 @@ class FormatPdf
         ];
     }
 
-    public static function savePdfToStorage($pdf, string $filename): string
+    public static function savePdfToStorage(PDF $pdf, string $filename): string
     {
         $directory = AppConstant::PDF_UPLOAD_PATH;
         $filepath = $directory . '/' . $filename;
         
-        if (!Storage::disk('public')->exists($directory)) {
-            Storage::disk('public')->makeDirectory($directory);
+        try {
+             if (!Storage::disk('public')->exists($directory)) {
+                if(!Storage::disk('public')->makeDirectory($directory)){
+                    throw new Exception('Failed to create directory: ' . $directory);
+                }
+            }
+
+            if(!Storage::disk('public')->put($filepath, $pdf->output())){
+                throw new Exception('Failed to save PDF to storage at: ' . $filepath);
+            }
+
+            return $filepath;
+        } catch (\Throwable $th) {
+            throw new Exception('Failed to save PDF to storage: ' . $th->getMessage());
         }
-        
-        Storage::disk('public')->put($filepath, $pdf->output());
-        
-        return $filepath;
     }
 
     public static function createPdfHtml(array $data): string
@@ -110,136 +120,16 @@ class FormatPdf
         $generatedDate = now()->format('d F Y H:i');
         $logoHtml = self::prepareLogo($logoUrl);
 
-        return '
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <meta charset="utf-8">
-            <title>' . htmlspecialchars($title) . '</title>
-            <style>
-                @page {
-                    margin: 120px 50px 80px 50px;
-                }
-                
-                body {
-                    font-family: Arial, sans-serif;
-                    font-size: 12px;
-                    line-height: 1.6;
-                    color: #333;
-                }
-                
-                .header {
-                    position: fixed;
-                    top: -100px;
-                    left: 0;
-                    right: 0;
-                    height: 100px;
-                    border-bottom: 2px solid #333;
-                    padding-bottom: 10px;
-                    padding-left: 50px;
-                    padding-right: 50px;
-                }
-                
-                .header-content {
-                    display: table;
-                    width: 100%;
-                }
-                
-                .header-left {
-                    display: table-cell;
-                    width: 90px;
-                    vertical-align: middle;
-                    padding-right: 15px;
-                }
-                
-                .header-center {
-                    display: table-cell;
-                    text-align: center;
-                    vertical-align: middle;
-                    padding-left: 0;
-                }
-                
-                .institution-name {
-                    font-size: 18px;
-                    font-weight: bold;
-                    margin: 0;
-                    padding: 0;
-                }
-                
-                .institution-details {
-                    font-size: 10px;
-                    margin: 5px 0 0 0;
-                }
-                
-                .footer {
-                    position: fixed;
-                    bottom: -60px;
-                    left: 0;
-                    right: 0;
-                    height: 50px;
-                    border-top: 1px solid #333;
-                    padding-top: 10px;
-                    font-size: 10px;
-                    padding-left: 50px;
-                    padding-right: 50px;
-                }
-                
-                .content {
-                    margin-top: 20px;
-                    padding: 0 40px;
-                }
-                
-                .document-title {
-                    font-size: 16px;
-                    font-weight: bold;
-                    text-align: center;
-                    margin-bottom: 10px;
-                    text-transform: uppercase;
-                    padding: 0;
-                }
-                
-                .generated-date {
-                    font-size: 11px;
-                    text-align: center;
-                    margin-bottom: 20px;
-                    color: #666;
-                }
-                
-                .document-content {
-                    text-align: justify;
-                    margin-top: 20px;
-                    padding: 0;
-                    line-height: 1.8;
-                }
-            </style>
-        </head>
-        <body>
-            <div class="header">
-                <div class="header-content">
-                    <div class="header-left">' . $logoHtml . '</div>
-                    <div class="header-center">
-                        <h1 class="institution-name">' . htmlspecialchars($institutionName) . '</h1>
-                        <div class="institution-details">
-                            ' . htmlspecialchars($address) . 
-                            (!empty($phone) ? '<br>Telp: ' . htmlspecialchars($phone) : '') . '
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="footer">
-                <!-- Footer content rendered by DomPDF canvas -->
-            </div>
-            
-            <div class="content">
-                <div class="document-title">' . htmlspecialchars($title) . '</div>
-                <div class="generated-date">Tanggal Generate: ' . $generatedDate . '</div>
-                <div class="document-content">
-                    ' . nl2br(htmlspecialchars($content)) . '
-                </div>
-            </div>
-        </body>
-        </html>';
+        return view('template', [
+            'title' => $title,
+            'institutionName' => $institutionName,
+            'address' => $address,
+            'phone' => $phone,
+            'logoHtml' => $logoHtml,
+            'logoUrl' => $logoUrl,
+            'content' => $content,
+            'generatedDate' => $generatedDate,
+        ])->render();
     }
 
     private static function prepareLogo(string $logoUrl): string
